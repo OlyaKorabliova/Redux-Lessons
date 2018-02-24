@@ -1,5 +1,5 @@
 module.exports = {
-    entry: './src/AddCounters.js',
+    entry: './src/ToDoList.js',
     output: {
         filename: './build/bundle.js'
     },
