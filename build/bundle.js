@@ -727,10 +727,6 @@ var todo = function todo(state, action) {
             return Object.assign({}, state, {
                 completed: !state.completed
             });
-        // return {
-        //     ...state,
-        //     completed: !state.completed
-        // };
         default:
             return state;
 
@@ -766,15 +762,10 @@ var visibilityFilter = function visibilityFilter() {
     }
 };
 
-var todoApp = function todoApp() {
-    var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-    var action = arguments[1];
-
-    return {
-        todos: todos(state.todos, action),
-        visibilityFilter: visibilityFilter(state.visibilityFilter, action)
-    };
-};
+var todoApp = (0, _redux.combineReducers)({
+    todos: todos,
+    visibilityFilter: visibilityFilter
+});
 
 var testAddTodo = function testAddTodo() {
     var stateBefore = [];
