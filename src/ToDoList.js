@@ -1,6 +1,4 @@
-import expect from "expect"
-import deepFreeze from "deep-freeze"
-import {createStore, combineReducers} from "redux"
+import {createStore} from "redux"
 
 const todo = (state, action) => {
     switch (action.type) {
@@ -50,74 +48,26 @@ const visibilityFilter = (
     }
 };
 
+const combineReducers = (reducers) => {
+    return (state={}, action) => {
+        return Object.keys(reducers).reduce(
+            (nextState, key) => {
+                nextState[key] = reducers[key](
+                    state[key],
+                    action
+                );
+                return nextState;
+            },
+            {}
+        );
+    };
+};
+
+
 const todoApp = combineReducers({
     todos,
     visibilityFilter
 });
-
-const testAddTodo = () => {
-    const stateBefore = [];
-    const action = {
-        type: "ADD_TODO",
-        id: 0,
-        text: "Learn SMTH"
-    };
-    const stateAfter = [{
-        id: 0,
-        text: "Learn SMTH",
-        completed: false
-    }];
-
-    deepFreeze(stateBefore);
-    deepFreeze(action);
-
-    expect(
-        todos(stateBefore, action)
-    ).toEqual(stateAfter);
-};
-
-const testToggleTodo = () => {
-    const stateBefore = [
-        {
-            id: 0,
-            text: "Learn SMTH",
-            completed: false
-        },
-        {
-            id: 1,
-            text: "Go to the university",
-            completed: false
-        }
-    ];
-    const action = {
-        type: "TOGGLE_TODO",
-        id: 1
-    };
-    const stateAfter = [
-        {
-            id: 0,
-            text: "Learn SMTH",
-            completed: false
-        },
-        {
-            id: 1,
-            text: "Go to the university",
-            completed: true
-        }
-    ];
-
-    deepFreeze(stateBefore);
-    deepFreeze(action);
-
-    expect(
-        todos(stateBefore, action)
-    ).toEqual(stateAfter);
-};
-
-
-testAddTodo();
-testToggleTodo();
-console.log("All tests passed!");
 
 const store = createStore(todoApp);
 
