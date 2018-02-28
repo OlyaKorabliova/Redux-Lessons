@@ -1452,12 +1452,58 @@ var visibilityFilter = function visibilityFilter() {
     }
 };
 
+var VisibleTodoList = function (_Component) {
+    _inherits(VisibleTodoList, _Component);
+
+    function VisibleTodoList() {
+        _classCallCheck(this, VisibleTodoList);
+
+        return _possibleConstructorReturn(this, (VisibleTodoList.__proto__ || Object.getPrototypeOf(VisibleTodoList)).apply(this, arguments));
+    }
+
+    _createClass(VisibleTodoList, [{
+        key: "componentDidMount",
+        value: function componentDidMount() {
+            var _this2 = this;
+
+            var store = this.props.store;
+
+            this.unsubscribe = store.subscribe(function () {
+                return _this2.forceUpdate();
+            });
+        }
+    }, {
+        key: "componentWillUnmount",
+        value: function componentWillUnmount() {
+            this.unsubscribe();
+        }
+    }, {
+        key: "render",
+        value: function render() {
+            var props = this.props;
+            var store = props.store;
+
+            var state = store.getState();
+
+            return _react2.default.createElement(TodoList, {
+                todos: getVisibleTodos(state.todos, state.visibilityFilter),
+                onTodoClick: function onTodoClick(id) {
+                    return store.dispatch({
+                        type: "TOGGLE_TODO",
+                        id: id
+                    });
+                }
+            });
+        }
+    }]);
+
+    return VisibleTodoList;
+}(_react.Component);
+
 var todoApp = (0, _redux.combineReducers)({
     todos: todos,
     visibilityFilter: visibilityFilter
 });
-
-var store = (0, _redux.createStore)(todoApp);
 
 var Link = function Link(_ref) {
     var active = _ref.active,
@@ -1481,8 +1527,8 @@ var Link = function Link(_ref) {
     );
 };
 
-var FilterLink = function (_Component) {
-    _inherits(FilterLink, _Component);
+var FilterLink = function (_Component2) {
+    _inherits(FilterLink, _Component2);
 
     function FilterLink() {
         _classCallCheck(this, FilterLink);
@@ -1493,10 +1539,13 @@ var FilterLink = function (_Component) {
     _createClass(FilterLink, [{
         key: "componentDidMount",
         value: function componentDidMount() {
-            var _this2 = this;
+            var _this4 = this;
+
+            var store = this.props.store;
+
 
             this.unsubscribe = store.subscribe(function () {
-                return _this2.forceUpdate();
+                return _this4.forceUpdate();
             });
         }
     }, {
@@ -1508,6 +1557,8 @@ var FilterLink = function (_Component) {
         key: "render",
         value: function render() {
             var props = this.props;
+            var store = props.store;
+
             var state = store.getState();
 
             return _react2.default.createElement(
@@ -1562,7 +1613,7 @@ var TodoList = function TodoList(_ref3) {
 };
 
 var AddTodo = function AddTodo(_ref4) {
-    var onAddClick = _ref4.onAddClick;
+    var store = _ref4.store;
 
     var input = void 0;
     return _react2.default.createElement(
@@ -1575,7 +1626,11 @@ var AddTodo = function AddTodo(_ref4) {
             "button",
             {
                 onClick: function onClick() {
-                    onAddClick(input.value);
+                    store.dispatch({
+                        type: "ADD_TODO",
+                        id: nextTodoId++,
+                        text: input.value
+                    });
                     input.value = '';
                 }
             },
@@ -1584,7 +1639,8 @@ var AddTodo = function AddTodo(_ref4) {
     );
 };
 
-var Footer = function Footer() {
+var Footer = function Footer(_ref5) {
+    var store = _ref5.store;
     return _react2.default.createElement(
         "p",
         null,
@@ -1593,7 +1649,8 @@ var Footer = function Footer() {
         _react2.default.createElement(
             FilterLink,
             {
-                filter: "SHOW_ALL"
+                filter: "SHOW_ALL",
+                store: store
             },
             "All"
         ),
@@ -1601,7 +1658,8 @@ var Footer = function Footer() {
         _react2.default.createElement(
             FilterLink,
             {
-                filter: "SHOW_ACTIVE"
+                filter: "SHOW_ACTIVE",
+                store: store
             },
             "Active"
         ),
@@ -1609,7 +1667,8 @@ var Footer = function Footer() {
         _react2.default.createElement(
             FilterLink,
             {
-                filter: "SHOW_COMPLETED"
+                filter: "SHOW_COMPLETED",
+                store: store
             },
             "Completed"
         )
@@ -1631,40 +1690,17 @@ var getVisibleTodos = function getVisibleTodos(todos, filter) {
     }
 };
 
-var TodoApp = function TodoApp(_ref5) {
-    var todos = _ref5.todos,
-        visibilityFilter = _ref5.visibilityFilter;
+var TodoApp = function TodoApp() {
     return _react2.default.createElement(
         "div",
         null,
-        _react2.default.createElement(AddTodo, {
-            onAddClick: function onAddClick(text) {
-                return store.dispatch({
-                    type: "ADD_TODO",
-                    id: nextTodoId++,
-                    text: text
-                });
-            }
-        }),
-        _react2.default.createElement(TodoList, {
-            todos: getVisibleTodos(todos, visibilityFilter),
-            onTodoClick: function onTodoClick(id) {
-                return store.dispatch({
-                    type: "TOGGLE_TODO",
-                    id: id
-                });
-            }
-        }),
-        _react2.default.createElement(Footer, null)
+        _react2.default.createElement(AddTodo, { store: store }),
+        _react2.default.createElement(VisibleTodoList, { store: store }),
+        _react2.default.createElement(Footer, { store: store })
     );
 };
 
-var render = function render() {
-    _reactDom2.default.render(_react2.default.createElement(TodoApp, store.getState()), document.getElementById("root"));
-};
-
-store.subscribe(render);
-render();
+_reactDom2.default.render(_react2.default.createElement(TodoApp, { store: (0, _redux.createStore)(todoApp) }), document.getElementById("root"));
 
 /***/ }),
 /* 21 */
