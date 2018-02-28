@@ -1466,7 +1466,7 @@ var VisibleTodoList = function (_Component) {
         value: function componentDidMount() {
             var _this2 = this;
 
-            var store = this.props.store;
+            var store = this.context.store;
 
             this.unsubscribe = store.subscribe(function () {
                 return _this2.forceUpdate();
@@ -1480,8 +1480,7 @@ var VisibleTodoList = function (_Component) {
     }, {
         key: "render",
         value: function render() {
-            var props = this.props;
-            var store = props.store;
+            var store = this.context.store;
 
             var state = store.getState();
 
@@ -1499,6 +1498,10 @@ var VisibleTodoList = function (_Component) {
 
     return VisibleTodoList;
 }(_react.Component);
+
+VisibleTodoList.contextTypes = {
+    store: _react2.default.PropTypes.object
+};
 
 var todoApp = (0, _redux.combineReducers)({
     todos: todos,
@@ -1541,8 +1544,7 @@ var FilterLink = function (_Component2) {
         value: function componentDidMount() {
             var _this4 = this;
 
-            var store = this.props.store;
-
+            var store = this.context.store;
 
             this.unsubscribe = store.subscribe(function () {
                 return _this4.forceUpdate();
@@ -1557,7 +1559,7 @@ var FilterLink = function (_Component2) {
         key: "render",
         value: function render() {
             var props = this.props;
-            var store = props.store;
+            var store = this.context.store;
 
             var state = store.getState();
 
@@ -1579,6 +1581,10 @@ var FilterLink = function (_Component2) {
 
     return FilterLink;
 }(_react.Component);
+
+FilterLink.contextTypes = {
+    store: _react2.default.PropTypes.object
+};
 
 var Todo = function Todo(_ref2) {
     var onClick = _ref2.onClick,
@@ -1612,7 +1618,7 @@ var TodoList = function TodoList(_ref3) {
     );
 };
 
-var AddTodo = function AddTodo(_ref4) {
+var AddTodo = function AddTodo(props, _ref4) {
     var store = _ref4.store;
 
     var input = void 0;
@@ -1638,9 +1644,11 @@ var AddTodo = function AddTodo(_ref4) {
         )
     );
 };
+AddTodo.contextTypes = {
+    store: _react2.default.PropTypes.object
+};
 
-var Footer = function Footer(_ref5) {
-    var store = _ref5.store;
+var Footer = function Footer() {
     return _react2.default.createElement(
         "p",
         null,
@@ -1649,8 +1657,7 @@ var Footer = function Footer(_ref5) {
         _react2.default.createElement(
             FilterLink,
             {
-                filter: "SHOW_ALL",
-                store: store
+                filter: "SHOW_ALL"
             },
             "All"
         ),
@@ -1658,8 +1665,7 @@ var Footer = function Footer(_ref5) {
         _react2.default.createElement(
             FilterLink,
             {
-                filter: "SHOW_ACTIVE",
-                store: store
+                filter: "SHOW_ACTIVE"
             },
             "Active"
         ),
@@ -1667,8 +1673,7 @@ var Footer = function Footer(_ref5) {
         _react2.default.createElement(
             FilterLink,
             {
-                filter: "SHOW_COMPLETED",
-                store: store
+                filter: "SHOW_COMPLETED"
             },
             "Completed"
         )
@@ -1694,13 +1699,47 @@ var TodoApp = function TodoApp() {
     return _react2.default.createElement(
         "div",
         null,
-        _react2.default.createElement(AddTodo, { store: store }),
-        _react2.default.createElement(VisibleTodoList, { store: store }),
-        _react2.default.createElement(Footer, { store: store })
+        _react2.default.createElement(AddTodo, null),
+        _react2.default.createElement(VisibleTodoList, null),
+        _react2.default.createElement(Footer, null)
     );
 };
 
-_reactDom2.default.render(_react2.default.createElement(TodoApp, { store: (0, _redux.createStore)(todoApp) }), document.getElementById("root"));
+var Provider = function (_Component3) {
+    _inherits(Provider, _Component3);
+
+    function Provider() {
+        _classCallCheck(this, Provider);
+
+        return _possibleConstructorReturn(this, (Provider.__proto__ || Object.getPrototypeOf(Provider)).apply(this, arguments));
+    }
+
+    _createClass(Provider, [{
+        key: "getChildContext",
+        value: function getChildContext() {
+            return {
+                store: this.props.store
+            };
+        }
+    }, {
+        key: "render",
+        value: function render() {
+            return this.props.children;
+        }
+    }]);
+
+    return Provider;
+}(_react.Component);
+
+Provider.childContextTypes = {
+    store: _react2.default.PropTypes.object
+};
+
+_reactDom2.default.render(_react2.default.createElement(
+    Provider,
+    { store: (0, _redux.createStore)(todoApp) },
+    _react2.default.createElement(TodoApp, { store: (0, _redux.createStore)(todoApp) })
+), document.getElementById("root"));
 
 /***/ }),
 /* 21 */
