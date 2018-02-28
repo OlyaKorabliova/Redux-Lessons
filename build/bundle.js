@@ -1485,6 +1485,28 @@ var TodoList = function TodoList(_ref2) {
     );
 };
 
+var addTodo = function addTodo(text) {
+    return {
+        type: "ADD_TODO",
+        id: nextTodoId++,
+        text: text
+    };
+};
+
+var setVisibilityFilter = function setVisibilityFilter(filter) {
+    return {
+        type: "SET_VISIBILITY_FILTER",
+        filter: filter
+    };
+};
+
+var toggleTodo = function toggleTodo(id) {
+    return {
+        type: "TOGGLE_TODO",
+        id: id
+    };
+};
+
 var visibilityFilter = function visibilityFilter() {
     var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : "SHOW_ALL";
     var action = arguments[1];
@@ -1505,10 +1527,7 @@ var mapStateToTodoListProps = function mapStateToTodoListProps(state) {
 var mapDispatchToTodoListProps = function mapDispatchToTodoListProps(dispatch) {
     return {
         onTodoClick: function onTodoClick(id) {
-            dispatch({
-                type: "TOGGLE_TODO",
-                id: id
-            });
+            dispatch(toggleTodo(id));
         }
     };
 };
@@ -1550,10 +1569,7 @@ var mapStateToLinkProps = function mapStateToLinkProps(state, ownProps) {
 var mapDispatchToLinkProps = function mapDispatchToLinkProps(dispatch, ownProps) {
     return {
         onClick: function onClick() {
-            dispatch({
-                type: "SET_VISIBILITY_FILTER",
-                filter: ownProps.filter
-            });
+            dispatch(setVisibilityFilter(ownProps.filter));
         }
     };
 };
@@ -1574,11 +1590,7 @@ var AddTodo = function AddTodo(_ref4) {
             "button",
             {
                 onClick: function onClick() {
-                    dispatch({
-                        type: "ADD_TODO",
-                        id: nextTodoId++,
-                        text: input.value
-                    });
+                    dispatch(addTodo(input.value));
                     input.value = '';
                 }
             },
