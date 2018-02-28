@@ -1397,9 +1397,9 @@ module.exports = focusNode;
 "use strict";
 
 
-var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
-
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 var _redux = __webpack_require__(22);
 
@@ -1465,6 +1465,38 @@ var todos = function todos() {
     }
 };
 
+var Todo = function Todo(_ref) {
+    var onClick = _ref.onClick,
+        completed = _ref.completed,
+        text = _ref.text;
+    return _react2.default.createElement(
+        "li",
+        { onClick: onClick,
+            style: {
+                textDecoration: completed ? 'line-through' : 'none'
+            } },
+        text
+    );
+};
+
+var TodoList = function TodoList(_ref2) {
+    var todos = _ref2.todos,
+        onTodoClick = _ref2.onTodoClick;
+    return _react2.default.createElement(
+        "ul",
+        null,
+        todos.map(function (todo) {
+            return _react2.default.createElement(Todo, _extends({
+                key: todo.id
+            }, todo, {
+                onClick: function onClick() {
+                    return onTodoClick(todo.id);
+                }
+            }));
+        })
+    );
+};
+
 var visibilityFilter = function visibilityFilter() {
     var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : "SHOW_ALL";
     var action = arguments[1];
@@ -1477,66 +1509,34 @@ var visibilityFilter = function visibilityFilter() {
     }
 };
 
-var VisibleTodoList = function (_Component) {
-    _inherits(VisibleTodoList, _Component);
-
-    function VisibleTodoList() {
-        _classCallCheck(this, VisibleTodoList);
-
-        return _possibleConstructorReturn(this, (VisibleTodoList.__proto__ || Object.getPrototypeOf(VisibleTodoList)).apply(this, arguments));
-    }
-
-    _createClass(VisibleTodoList, [{
-        key: "componentDidMount",
-        value: function componentDidMount() {
-            var _this2 = this;
-
-            var store = this.context.store;
-
-            this.unsubscribe = store.subscribe(function () {
-                return _this2.forceUpdate();
-            });
-        }
-    }, {
-        key: "componentWillUnmount",
-        value: function componentWillUnmount() {
-            this.unsubscribe();
-        }
-    }, {
-        key: "render",
-        value: function render() {
-            var store = this.context.store;
-
-            var state = store.getState();
-
-            return _react2.default.createElement(TodoList, {
-                todos: getVisibleTodos(state.todos, state.visibilityFilter),
-                onTodoClick: function onTodoClick(id) {
-                    return store.dispatch({
-                        type: "TOGGLE_TODO",
-                        id: id
-                    });
-                }
-            });
-        }
-    }]);
-
-    return VisibleTodoList;
-}(_react.Component);
-
-VisibleTodoList.contextTypes = {
-    store: _propTypes2.default.object
+var mapStateToTodoListProps = function mapStateToTodoListProps(state) {
+    return {
+        todos: getVisibleTodos(state.todos, state.visibilityFilter)
+    };
 };
+
+var mapDispatchToTodoListProps = function mapDispatchToTodoListProps(dispatch) {
+    return {
+        onTodoClick: function onTodoClick(id) {
+            dispatch({
+                type: "TOGGLE_TODO",
+                id: id
+            });
+        }
+    };
+};
+
+var VisibleTodoList = (0, _reactRedux.connect)(mapStateToTodoListProps, mapDispatchToTodoListProps)(TodoList);
 
 var todoApp = (0, _redux.combineReducers)({
     todos: todos,
     visibilityFilter: visibilityFilter
 });
 
-var Link = function Link(_ref) {
-    var active = _ref.active,
-        children = _ref.children,
-        _onClick = _ref.onClick;
+var Link = function Link(_ref3) {
+    var active = _ref3.active,
+        children = _ref3.children,
+        _onClick = _ref3.onClick;
 
     if (active) {
         return _react2.default.createElement(
@@ -1555,8 +1555,8 @@ var Link = function Link(_ref) {
     );
 };
 
-var FilterLink = function (_Component2) {
-    _inherits(FilterLink, _Component2);
+var FilterLink = function (_Component) {
+    _inherits(FilterLink, _Component);
 
     function FilterLink() {
         _classCallCheck(this, FilterLink);
@@ -1567,12 +1567,12 @@ var FilterLink = function (_Component2) {
     _createClass(FilterLink, [{
         key: "componentDidMount",
         value: function componentDidMount() {
-            var _this4 = this;
+            var _this2 = this;
 
             var store = this.context.store;
 
             this.unsubscribe = store.subscribe(function () {
-                return _this4.forceUpdate();
+                return _this2.forceUpdate();
             });
         }
     }, {
@@ -1609,38 +1609,6 @@ var FilterLink = function (_Component2) {
 
 FilterLink.contextTypes = {
     store: _propTypes2.default.object
-};
-
-var Todo = function Todo(_ref2) {
-    var onClick = _ref2.onClick,
-        completed = _ref2.completed,
-        text = _ref2.text;
-    return _react2.default.createElement(
-        "li",
-        { onClick: onClick,
-            style: {
-                textDecoration: completed ? 'line-through' : 'none'
-            } },
-        text
-    );
-};
-
-var TodoList = function TodoList(_ref3) {
-    var todos = _ref3.todos,
-        onTodoClick = _ref3.onTodoClick;
-    return _react2.default.createElement(
-        "ul",
-        null,
-        todos.map(function (todo) {
-            return _react2.default.createElement(Todo, _extends({
-                key: todo.id
-            }, todo, {
-                onClick: function onClick() {
-                    return onTodoClick(todo.id);
-                }
-            }));
-        })
-    );
 };
 
 var AddTodo = function AddTodo(props, _ref4) {
