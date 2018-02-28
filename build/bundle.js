@@ -1403,10 +1403,6 @@ var _redux = __webpack_require__(22);
 
 var _reactRedux = __webpack_require__(56);
 
-var _propTypes = __webpack_require__(37);
-
-var _propTypes2 = _interopRequireDefault(_propTypes);
-
 var _react = __webpack_require__(8);
 
 var _react2 = _interopRequireDefault(_react);
@@ -1550,14 +1546,18 @@ var mapStateToLinkProps = function mapStateToLinkProps(state, ownProps) {
         active: ownProps.filter === state.visibilityFilter
     };
 };
+
 var mapDispatchToLinkProps = function mapDispatchToLinkProps(dispatch, ownProps) {
     return {
-        onClick: dispatch({
-            type: "SET_VISIBILITY_FILTER",
-            filter: ownProps.filter
-        })
+        onClick: function onClick() {
+            dispatch({
+                type: "SET_VISIBILITY_FILTER",
+                filter: ownProps.filter
+            });
+        }
     };
 };
+
 var FilterLink = (0, _reactRedux.connect)(mapStateToLinkProps, mapDispatchToLinkProps)(Link);
 
 var AddTodo = function AddTodo(_ref4) {

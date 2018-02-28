@@ -1,7 +1,6 @@
 import {createStore, combineReducers} from "redux"
 import {Provider, connect} from "react-redux"
-import PropTypes from "prop-types"
-import React, {Component} from "react"
+import React from "react"
 import ReactDOM from "react-dom"
 
 
@@ -117,17 +116,23 @@ const Link = ({active, children, onClick}) => {
 
 const mapStateToLinkProps = (state, ownProps) => {
     return {
-        active: ownProps.filter === state.visibilityFilter
+        active:
+            ownProps.filter ===
+            state.visibilityFilter
     }
 };
+
 const mapDispatchToLinkProps = (dispatch, ownProps) => {
     return {
-        onClick: dispatch({
-            type: "SET_VISIBILITY_FILTER",
-            filter: ownProps.filter
-        })
+        onClick: () => {
+            dispatch({
+                type: "SET_VISIBILITY_FILTER",
+                filter: ownProps.filter
+            })
+        }
     }
 };
+
 const FilterLink = connect(
     mapStateToLinkProps,
     mapDispatchToLinkProps
