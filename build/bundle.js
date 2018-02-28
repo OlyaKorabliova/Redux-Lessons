@@ -1514,7 +1514,6 @@ var mapStateToTodoListProps = function mapStateToTodoListProps(state) {
         todos: getVisibleTodos(state.todos, state.visibilityFilter)
     };
 };
-
 var mapDispatchToTodoListProps = function mapDispatchToTodoListProps(dispatch) {
     return {
         onTodoClick: function onTodoClick(id) {
@@ -1525,7 +1524,6 @@ var mapDispatchToTodoListProps = function mapDispatchToTodoListProps(dispatch) {
         }
     };
 };
-
 var VisibleTodoList = (0, _reactRedux.connect)(mapStateToTodoListProps, mapDispatchToTodoListProps)(TodoList);
 
 var todoApp = (0, _redux.combineReducers)({
@@ -1611,8 +1609,8 @@ FilterLink.contextTypes = {
     store: _propTypes2.default.object
 };
 
-var AddTodo = function AddTodo(props, _ref4) {
-    var store = _ref4.store;
+var AddTodo = function AddTodo(_ref4) {
+    var dispatch = _ref4.dispatch;
 
     var input = void 0;
     return _react2.default.createElement(
@@ -1625,7 +1623,7 @@ var AddTodo = function AddTodo(props, _ref4) {
             "button",
             {
                 onClick: function onClick() {
-                    store.dispatch({
+                    dispatch({
                         type: "ADD_TODO",
                         id: nextTodoId++,
                         text: input.value
@@ -1637,9 +1635,7 @@ var AddTodo = function AddTodo(props, _ref4) {
         )
     );
 };
-AddTodo.contextTypes = {
-    store: _propTypes2.default.object
-};
+AddTodo = (0, _reactRedux.connect)()(AddTodo);
 
 var Footer = function Footer() {
     return _react2.default.createElement(
