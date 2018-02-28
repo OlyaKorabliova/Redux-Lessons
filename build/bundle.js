@@ -1397,8 +1397,6 @@ module.exports = focusNode;
 "use strict";
 
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 var _redux = __webpack_require__(22);
@@ -1418,12 +1416,6 @@ var _reactDom = __webpack_require__(42);
 var _reactDom2 = _interopRequireDefault(_reactDom);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 
@@ -1553,61 +1545,20 @@ var Link = function Link(_ref3) {
     );
 };
 
-var FilterLink = function (_Component) {
-    _inherits(FilterLink, _Component);
-
-    function FilterLink() {
-        _classCallCheck(this, FilterLink);
-
-        return _possibleConstructorReturn(this, (FilterLink.__proto__ || Object.getPrototypeOf(FilterLink)).apply(this, arguments));
-    }
-
-    _createClass(FilterLink, [{
-        key: "componentDidMount",
-        value: function componentDidMount() {
-            var _this2 = this;
-
-            var store = this.context.store;
-
-            this.unsubscribe = store.subscribe(function () {
-                return _this2.forceUpdate();
-            });
-        }
-    }, {
-        key: "componentWillUnmount",
-        value: function componentWillUnmount() {
-            this.unsubscribe();
-        }
-    }, {
-        key: "render",
-        value: function render() {
-            var props = this.props;
-            var store = this.context.store;
-
-            var state = store.getState();
-
-            return _react2.default.createElement(
-                Link,
-                {
-                    active: props.filter === state.visibilityFilter,
-                    onClick: function onClick() {
-                        return store.dispatch({
-                            type: "SET_VISIBILITY_FILTER",
-                            filter: props.filter
-                        });
-                    }
-                },
-                props.children
-            );
-        }
-    }]);
-
-    return FilterLink;
-}(_react.Component);
-
-FilterLink.contextTypes = {
-    store: _propTypes2.default.object
+var mapStateToLinkProps = function mapStateToLinkProps(state, ownProps) {
+    return {
+        active: ownProps.filter === state.visibilityFilter
+    };
 };
+var mapDispatchToLinkProps = function mapDispatchToLinkProps(dispatch, ownProps) {
+    return {
+        onClick: dispatch({
+            type: "SET_VISIBILITY_FILTER",
+            filter: ownProps.filter
+        })
+    };
+};
+var FilterLink = (0, _reactRedux.connect)(mapStateToLinkProps, mapDispatchToLinkProps)(Link);
 
 var AddTodo = function AddTodo(_ref4) {
     var dispatch = _ref4.dispatch;
