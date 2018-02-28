@@ -1,4 +1,5 @@
 import {createStore, combineReducers} from "redux"
+import PropTypes from "prop-types"
 import React, {Component} from "react"
 import ReactDOM from "react-dom"
 
@@ -84,7 +85,7 @@ class VisibleTodoList extends Component {
     }
 }
 VisibleTodoList.contextTypes = {
-    store: React.PropTypes.object
+    store: PropTypes.object
 };
 
 
@@ -138,7 +139,7 @@ class FilterLink extends Component {
     };
 }
 FilterLink.contextTypes = {
-    store: React.PropTypes.object
+    store: PropTypes.object
 };
 
 
@@ -186,7 +187,7 @@ const AddTodo = (props, {store}) => {
     </div>
 };
 AddTodo.contextTypes = {
-    store: React.PropTypes.object
+    store: PropTypes.object
 };
 
 
@@ -248,13 +249,13 @@ class Provider extends Component {
 }
 
 Provider.childContextTypes = {
-    store: React.PropTypes.object
+    store: PropTypes.object
 };
 
 
 ReactDOM.render(
     <Provider store={createStore(todoApp)}>
-        <TodoApp store={createStore(todoApp)}/>
+        <TodoApp />
     </Provider>,
     document.getElementById("root")
 );
