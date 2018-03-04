@@ -3,22 +3,21 @@ import ReactDOM from "react-dom"
 import todoApp from "./reducers";
 import {createStore} from "redux";
 import {Provider} from "react-redux"
+import {loadState, saveState} from "./localStorage"
 import {App} from "./components/App"
+import throttle from "lodash/throttle";
 
-const persistedState = {
-    todos: [{
-        id: '0',
-        text: 'Welcome',
-        completed: false
-    }],
-    visibilityFilter: undefined
-};
-
+const persistedState = loadState();
 const store = createStore(
     todoApp,
     persistedState
 );
-console.log(store.getState());
+
+store.subscribe(throttle(() => {
+    saveState({
+        todos: store.getState().todos
+    });
+}, 1000));
 
 ReactDOM.render(
     <Provider store={store}>
