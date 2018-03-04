@@ -1993,9 +1993,21 @@ var _App = __webpack_require__(72);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+var persistedState = {
+    todos: [{
+        id: '0',
+        text: 'Welcome',
+        completed: false
+    }],
+    visibilityFilter: undefined
+};
+
+var store = (0, _redux.createStore)(_reducers2.default, persistedState);
+console.log(store.getState());
+
 _reactDom2.default.render(_react2.default.createElement(
     _reactRedux.Provider,
-    { store: (0, _redux.createStore)(_reducers2.default) },
+    { store: store },
     _react2.default.createElement(_App.App, null)
 ), document.getElementById("root"));
 
