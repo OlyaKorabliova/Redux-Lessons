@@ -3,7 +3,7 @@ import VisibleTodoList from "./VisibleTodoList";
 import AddTodo from "./AddTodo"
 import Footer from "./Footer"
 
-export const App = ({params}) => (
+export const App = () => (
     <div>
         <AddTodo />
         <VisibleTodoList />
