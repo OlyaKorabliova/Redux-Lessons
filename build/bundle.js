@@ -8586,7 +8586,7 @@ function isPlainObject(value) {
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
-exports.getIsFetching = exports.getVisibleTodos = undefined;
+exports.getErrorMessage = exports.getIsFetching = exports.getVisibleTodos = undefined;
 
 var _redux = __webpack_require__(35);
 
@@ -8621,6 +8621,10 @@ var getVisibleTodos = exports.getVisibleTodos = function getVisibleTodos(state, 
 
 var getIsFetching = exports.getIsFetching = function getIsFetching(state, filter) {
     return fromList.getIsFetching(state.listByFilter[filter]);
+};
+
+var getErrorMessage = exports.getErrorMessage = function getErrorMessage(state, filter) {
+    return fromList.getErrorMessage(state.listByFilter[filter]);
 };
 
 /***/ }),
@@ -12438,29 +12442,27 @@ var _reducers = __webpack_require__(47);
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
-var requestTodos = function requestTodos(filter) {
-    return {
-        type: 'REQUEST_TODOS',
-        filter: filter
-    };
-};
-
-var receiveTodos = function receiveTodos(filter, response) {
-    return {
-        type: "RECEIVE_TODOS",
-        response: response,
-        filter: filter
-    };
-};
-
 var fetchTodos = exports.fetchTodos = function fetchTodos(filter) {
     return function (dispatch, getState) {
         if ((0, _reducers.getIsFetching)(getState(), filter)) {
             return Promise.resolve();
         }
-        dispatch(requestTodos(filter));
+        dispatch({
+            type: 'FETCH_TODOS_REQUEST',
+            filter: filter
+        });
         return api.fetchTodos(filter).then(function (response) {
-            dispatch(receiveTodos(filter, response));
+            dispatch({
+                type: "FETCH_TODOS_SUCCESS",
+                response: response,
+                filter: filter
+            });
+        }, function (error) {
+            dispatch({
+                type: 'FETCH_TODOS_FAILURE',
+                filter: filter,
+                message: error.message || 'Smth went wrong.'
+            });
         });
     };
 };
@@ -35560,7 +35562,7 @@ var byId = function byId() {
     var action = arguments[1];
 
     switch (action.type) {
-        case 'RECEIVE_TODOS':
+        case 'FETCH_TODOS_SUCCESS':
             var nextState = _extends({}, state);
             action.response.forEach(function (todo) {
                 nextState[todo.id] = todo;
@@ -35586,7 +35588,7 @@ var getTodo = exports.getTodo = function getTodo(state, id) {
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
-exports.getIsFetching = exports.getIds = undefined;
+exports.getErrorMessage = exports.getIsFetching = exports.getIds = undefined;
 
 var _redux = __webpack_require__(35);
 
@@ -35599,7 +35601,7 @@ var createList = function createList(filter) {
             return state;
         }
         switch (action.type) {
-            case 'RECEIVE_TODOS':
+            case 'FETCH_TODOS_SUCCESS':
                 return action.response.map(function (todo) {
                     return todo.id;
                 });
@@ -35616,10 +35618,29 @@ var createList = function createList(filter) {
             return state;
         }
         switch (action.type) {
-            case 'REQUEST_TODOS':
+            case 'FETCH_TODOS_REQUEST':
                 return true;
-            case 'RECEIVE_TODOS':
+            case 'FETCH_TODOS_SUCCESS':
+            case 'FETCH_TODOS_FAILURE':
                 return false;
+            default:
+                return state;
+        }
+    };
+
+    var errorMessage = function errorMessage() {
+        var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+        var action = arguments[1];
+
+        if (filter !== action.filter) {
+            return state;
+        }
+        switch (action.type) {
+            case 'FETCH_TODOS_FAILURE':
+                return action.message;
+            case 'FETCH_TODOS_REQUEST':
+            case 'FETCH_TODOS_SUCCESS':
+                return null;
             default:
                 return state;
         }
@@ -35627,7 +35648,8 @@ var createList = function createList(filter) {
 
     return (0, _redux.combineReducers)({
         ids: ids,
-        isFetching: isFetching
+        isFetching: isFetching,
+        errorMessage: errorMessage
     });
 };
 
@@ -35638,6 +35660,10 @@ var getIds = exports.getIds = function getIds(state) {
 
 var getIsFetching = exports.getIsFetching = function getIsFetching(state) {
     return state.isFetching;
+};
+
+var getErrorMessage = exports.getErrorMessage = function getErrorMessage(state) {
+    return state.errorMessage;
 };
 
 /***/ }),
@@ -37063,6 +37089,10 @@ var _reactRouter = __webpack_require__(62);
 
 var _reducers = __webpack_require__(47);
 
+var _FetchErrors = __webpack_require__(300);
+
+var _FetchErrors2 = _interopRequireDefault(_FetchErrors);
+
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -37106,10 +37136,13 @@ var VisibleTodoList = function (_Component) {
     }, {
         key: "render",
         value: function render() {
+            var _this2 = this;
+
             var _props2 = this.props,
                 toggleTodo = _props2.toggleTodo,
                 todos = _props2.todos,
-                isFetching = _props2.isFetching;
+                isFetching = _props2.isFetching,
+                errorMessage = _props2.errorMessage;
 
             if (isFetching && !todos.length) {
                 return _react2.default.createElement(
@@ -37117,6 +37150,11 @@ var VisibleTodoList = function (_Component) {
                     null,
                     "Loading..."
                 );
+            }
+            if (errorMessage && !todos.length) {
+                return _react2.default.createElement(_FetchErrors2.default, { message: errorMessage, onRetry: function onRetry() {
+                        return _this2.fetchData();
+                    } });
             }
             return _react2.default.createElement(_TodoList.TodoList, {
                 todos: todos,
@@ -37134,6 +37172,7 @@ var mapStateToProps = function mapStateToProps(state, _ref) {
     var filter = params.filter || 'all';
     return {
         todos: (0, _reducers.getVisibleTodos)(state, filter),
+        errorMessage: (0, _reducers.getErrorMessage)(state, filter),
         isFetching: (0, _reducers.getIsFetching)(state, filter),
         filter: filter
     };
@@ -47224,6 +47263,9 @@ var delay = function delay(ms) {
 
 var fetchTodos = exports.fetchTodos = function fetchTodos(filter) {
     return delay(500).then(function () {
+        if (Math.random() > 0.5) {
+            throw new Error('Boom!');
+        }
         switch (filter) {
             case 'all':
                 return fakeDatabase.todos;
@@ -50557,6 +50599,45 @@ var FilterLink = function FilterLink(_ref) {
 };
 
 exports.default = FilterLink;
+
+/***/ }),
+/* 300 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _react = __webpack_require__(4);
+
+var _react2 = _interopRequireDefault(_react);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var FetchError = function FetchError(_ref) {
+    var message = _ref.message,
+        onRetry = _ref.onRetry;
+    return _react2.default.createElement(
+        'div',
+        null,
+        _react2.default.createElement(
+            'p',
+            null,
+            'Could not fetch todos. ',
+            message
+        ),
+        _react2.default.createElement(
+            'button',
+            { onClick: onRetry },
+            'Retry'
+        )
+    );
+};
+
+exports.default = FetchError;
 
 /***/ })
 /******/ ]);
