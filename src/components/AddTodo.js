@@ -5,15 +5,21 @@ import {addTodo} from "../actions"
 let AddTodo = ({dispatch}) => {
     let input;
     return <div>
-        <input ref={node => input = node}/>
-        <button
-            onClick={() => {
+        <form
+            onSubmit={e => {
+                e.preventDefault();
+                if (!input.value.trim()) {
+                    return;
+                }
                 dispatch(addTodo(input.value));
                 input.value = '';
             }}
         >
-            Add Todo
-        </button>
+            <input ref={node => input = node}/>
+            <button type="submit">
+                Add Todo
+            </button>
+        </form>
     </div>
 };
 AddTodo = connect()(AddTodo);
